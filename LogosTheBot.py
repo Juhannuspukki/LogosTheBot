@@ -67,6 +67,7 @@ def main():
     dp.add_handler(CommandHandler("menu", logosmenu.menu))
     dp.add_handler(CommandHandler("num", logosshorties.num, pass_args=True))
     dp.add_handler(CommandHandler("open", logostextonly.avoinna))
+    dp.add_handler(CommandHandler("alaoviauki", logospi.alaoviauki))
     dp.add_handler(CommandHandler("promillet", logosdrinks.promillet))
     dp.add_handler(CommandHandler("set", logostimer.set, pass_args=True, pass_job_queue=True))
     dp.add_handler(CommandHandler("start", start))

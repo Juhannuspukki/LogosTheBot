@@ -43,7 +43,8 @@ def android(bot, update):
 
 
 def kääretorttu(bot, update):
-    update.message.reply_text("Niin mikä kääretorttu?")
+    chatid = update.message.chat_id
+    bot.sendVideo(chat_id=chatid, video=open("RickAstley-NeverGonnaGiveYouUp.mp4", 'rb'))
 
 
 def num(bot, update, args):
