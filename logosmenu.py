@@ -5,36 +5,22 @@ import re
 from lxml import html
 
 
-def menu(bot, update):
-    päämuuttuja = "Newtonissa tarjolla:\n\n"
+def newton(bot, update):
+    update.message.reply_text(juvenes())
 
-    date = str(datetime.date.today())
-    day = date[8:]
-    month = date[5:7]
-    year = date[:4]
 
-    def stringfix(x):
-        x = x.replace(":", ": ")
-        x = x.replace("\\", "")
-        x = x.replace("xc3xb6", "ö")
-        x = x.replace("xc3xa4", "ä")
-        x = x.replace("u0026", "&")
-        x = x.replace("xc3xa9", "é")
-        x = x.replace("u00e4", "ä")
-        x = x.replace("u00f6", "ö")
-        x = x.replace("u2013", "")
-        return x
+def juvenes(KitchenId="6", MenuTypeId="60"):
+    try:
+        date = str(datetime.date.today())
+        day = date[8:]
+        month = date[5:7]
 
-    def juvenes(day, month, KitchenId, MenuTypeId):
         teksti = ""
         url = "http://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByDate?KitchenId=" \
               + KitchenId + "&MenuTypeId=" + MenuTypeId + "&Date='" + day + "/" + month + "'&lang='fi'&format=json"
         x = requests.get(url)
-        x = str(x.content)
+        x = x.content.decode("utf-8")
 
-        x = stringfix(x)
-
-        x = x[10:-5]
         menu = json.loads(x, encoding='utf-8')
 
         a = menu["MealOptions"]
@@ -45,23 +31,34 @@ def menu(bot, update):
             e = d["Name"]
             e2 = d["Diets"]
             teksti += "• " + e + " " + e2 + "\n"
-        return teksti
 
-    päämuuttuja += juvenes(day, month, "6", "60")
+        if not teksti:
+            teksti = "Ei mitään syötävää!\n\n"
+    except ValueError:
+        teksti = "Ei mitään syötävää!\n\n"
+    return teksti
+
+
+def menu(bot, update):
+    päämuuttuja = "Newtonissa tarjolla:\n\n"
+
+    date = str(datetime.date.today())
+    day = date[8:]
+    month = date[5:7]
+    year = date[:4]
+
+    päämuuttuja += juvenes("6", "60")
     päämuuttuja += "Ravintola Newton palvelee yleensä ma-to 10.30-16.00 ja pe 10.30-15.00" + "\n\n" + "Sååsibaarissa:\n\n"
-    päämuuttuja += juvenes(day, month, "60038", "77")
+    päämuuttuja += juvenes("60038", "77")
     päämuuttuja += "SÅÅSBAR on avoinna ma-pe 10.30-19.00" + "\n\n" + "Fusarissa:\n\n"
-    päämuuttuja += juvenes(day, month, "60038", "3")
+    päämuuttuja += juvenes("60038", "3")
     päämuuttuja += "Fusion Kitchen on avoinna ma-pe 10.30-18.45, Café Konehuone palvelee ma-pe klo 8-19" + "\n"
 
     päämuuttuja += "\n" + "Reaktori tarjoaa:" + "\n\n"
     url = "http://www.amica.fi/modules/json/json/Index?costNumber=0812&language=fi"
     x = requests.get(url)
-    x = str(x.content)
-    x = x[2:-1]
+    x = x.content.decode("utf-8")
 
-    x = stringfix(x)
-    x = x.replace("rn", "")
     x = x.replace("  ", "")
 
     menu = json.loads(x, encoding='utf-8')
@@ -84,9 +81,7 @@ def menu(bot, update):
     päämuuttuja += "\n" + "Hertsissä tänään:" + "\n\n"
     url = "http://www.sodexo.fi/ruokalistat/output/daily_json/12812/" + year + "/" + month + "/" + day + "/fi"
     x = requests.get(url)
-    x = str(x.content)
-    x = x[2:-1]
-    x = stringfix(x)
+    x = x.content.decode("utf-8")
 
     menu = json.loads(x, encoding='utf-8')
     menu = menu["courses"]
