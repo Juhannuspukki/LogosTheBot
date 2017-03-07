@@ -1,5 +1,5 @@
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, Filters
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardHide
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 import json
 import requests
 
@@ -59,7 +59,7 @@ def suunta(bot, update):
 def sijainti(bot, update):
     global nysselista
     diktaattori = {}
-    reply_markup = ReplyKeyboardHide()
+    reply_markup = ReplyKeyboardRemove()
     bot.sendMessage(chat_id=update.message.chat_id, text="Success.", reply_markup=reply_markup)
     user_location = update.message.location
     for i in range(len(nysselista)):
@@ -76,12 +76,7 @@ def sijainti(bot, update):
 def nysselokaattori():
     url = "http://data.itsfactory.fi/siriaccess/vm/json"
     x = requests.get(url)
-    x = str(x.content)
-
-    x = x[2:-1]
-    x = x.replace("\\", "")
-    x = x.replace("xc3xb6", "ö")
-    x = x.replace("xc3xa4", "ä")
+    x = x.content.decode("utf-8")
 
     lokaatio = json.loads(x, encoding='utf-8')
     informaatio = lokaatio["Siri"]["ServiceDelivery"]["VehicleMonitoringDelivery"][0]["VehicleActivity"]
@@ -89,7 +84,7 @@ def nysselokaattori():
 
 
 def cancel(bot, update):
-    reply_markup = ReplyKeyboardHide()
+    reply_markup = ReplyKeyboardRemove()
     bot.sendMessage(chat_id=update.message.chat_id, text="Operation cancelled.", reply_markup=reply_markup)
     return ConversationHandler.END
 

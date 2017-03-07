@@ -1,5 +1,5 @@
 import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, error
 from numpy import matrix
 from random import randint
 import json
@@ -215,8 +215,10 @@ def startgame(bot, update):
 def game(bot, update, lauta, n, ad=0, md=0):
     keyboard = generatekeyboard(lauta, n)
     reply_markup = InlineKeyboardMarkup(keyboard)
-
-    bot.editMessageText(chat_id=ad, message_id=md, text="Choose:", reply_markup=reply_markup)
+    try:
+        bot.editMessageText(chat_id=ad, message_id=md, text="Choose:", reply_markup=reply_markup)
+    except error.TelegramError:
+        pass
 
 
 def saving(lauta, n):

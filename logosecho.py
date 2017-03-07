@@ -92,11 +92,15 @@ def swearjar(bot, update):
     with open('saves.json', 'r') as fp:
         swearjardict = json.load(fp)
 
-    thischat = swearjardict[chatid]
-    if chatid in swearjardict.keys():
-        for nimet in sorted(thischat.keys()):
-            if thischat[nimet] == 0:
-                pass
-            else:
-                x = x + nimet + ": " + str(thischat[nimet]) + "\n"
-        update.message.reply_text(x)
+    try:
+        thischat = swearjardict[chatid]
+        if chatid in swearjardict.keys():
+            for nimet in sorted(thischat.keys()):
+                if thischat[nimet] == 0:
+                    pass
+                else:
+                    x = x + nimet + ": " + str(thischat[nimet]) + "\n"
+            update.message.reply_text(x)
+    except KeyError:
+        update.message.reply_text("I haven't recorded any uses of bad language in this chat yet.")
+

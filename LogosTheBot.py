@@ -28,6 +28,10 @@ def start(bot, update):
     update.message.reply_text("Good day, I'm Logos the Bot. Interactions are listed in /help.")
 
 
+def source(bot, update):
+    update.message.reply_text("https://github.com/Juhannuspukki/LogosTheBot")
+
+
 def marco(bot, update):
     update.message.reply_text("<i>polo</i>", parse_mode=ParseMode.HTML)
 
@@ -65,12 +69,14 @@ def main():
     dp.add_handler(CommandHandler("log", logostextonly.log))
     dp.add_handler(CommandHandler("marco", marco))
     dp.add_handler(CommandHandler("menu", logosmenu.menu))
+    dp.add_handler(CommandHandler("newton", logosmenu.newton))
     dp.add_handler(CommandHandler("num", logosshorties.num, pass_args=True))
     dp.add_handler(CommandHandler("open", logostextonly.avoinna))
     dp.add_handler(CommandHandler("alaoviauki", logospi.alaoviauki))
     dp.add_handler(CommandHandler("promillet", logosdrinks.promillet))
     dp.add_handler(CommandHandler("set", logostimer.set, pass_args=True, pass_job_queue=True))
     dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("source", source))
     dp.add_handler(CommandHandler("swearjar", logosecho.swearjar))
     dp.add_handler(CommandHandler("telok", logostelok.telok, pass_args=True))
     dp.add_handler(CommandHandler("thx", logosquestionables.thx))

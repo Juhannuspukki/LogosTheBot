@@ -19,7 +19,10 @@ def juvenes(KitchenId="6", MenuTypeId="60"):
         url = "http://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByDate?KitchenId=" \
               + KitchenId + "&MenuTypeId=" + MenuTypeId + "&Date='" + day + "/" + month + "'&lang='fi'&format=json"
         x = requests.get(url)
-        x = x.content.decode("utf-8")
+        x = x.content[7:-4]
+        x = x.decode("utf-8")
+        x = x.replace("\\", "")
+
 
         menu = json.loads(x, encoding='utf-8')
 
