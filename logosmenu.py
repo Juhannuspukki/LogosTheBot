@@ -23,7 +23,6 @@ def juvenes(KitchenId="6", MenuTypeId="60"):
         x = x.decode("utf-8")
         x = x.replace("\\", "")
 
-
         menu = json.loads(x, encoding='utf-8')
 
         a = menu["MealOptions"]
