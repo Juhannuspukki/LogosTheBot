@@ -4,7 +4,6 @@ import requests
 import re
 from lxml import html
 
-
 def newton(bot, update):
     update.message.reply_text(juvenes())
 

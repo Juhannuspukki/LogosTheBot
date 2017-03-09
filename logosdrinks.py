@@ -1,5 +1,5 @@
 from telegram.ext import CommandHandler, ConversationHandler, RegexHandler
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardHide
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 import json
 import emoji
 import time
@@ -41,11 +41,11 @@ def viinatulkki(bot, update):
             with open('accounts.json', 'w') as file:
                 json.dump(accounts, file, sort_keys=True, indent=4, separators=(',', ': '))
 
-            reply_markup = ReplyKeyboardHide()
+            reply_markup = ReplyKeyboardRemove()
             bot.sendMessage(chat_id=chatid, text="Logged. Cheers!", reply_markup=reply_markup)
             return ConversationHandler.END
         else:
-            reply_markup = ReplyKeyboardHide()
+            reply_markup = ReplyKeyboardRemove()
             bot.sendMessage(chat_id=chatid, text="Invalid username.", reply_markup=reply_markup)
             return ConversationHandler.END
 
@@ -67,7 +67,7 @@ def skål(bot, update):
             return DRINK
 
         else:
-            reply_markup = ReplyKeyboardHide()
+            reply_markup = ReplyKeyboardRemove()
             bot.sendMessage(chat_id=chatid, text="Invalid username/account not found.", reply_markup=reply_markup)
             return ConversationHandler.END
     except KeyError:
@@ -124,7 +124,7 @@ def promillelaskuri(bot, update, args):
 
 
 def cancel(bot, update):
-    reply_markup = ReplyKeyboardHide()
+    reply_markup = ReplyKeyboardRemove()
     bot.sendMessage(chat_id=update.message.chat_id, text="Operation cancelled.", reply_markup=reply_markup)
     return ConversationHandler.END
 

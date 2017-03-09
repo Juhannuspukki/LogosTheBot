@@ -22,6 +22,8 @@ def location(bot, update):
         update.message.reply_text("Turussa.")
     elif 61.145544 > user_location.latitude > 61.106880 and 21.558158 > user_location.longitude > 21.422560:
         update.message.reply_text("Raumalla.")
+    elif 61.145544 > user_location.latitude > 60.864152 and 22.449622 > user_location.longitude > 22.298078:
+        update.message.reply_text("Erittäin korvessa.")
     else:
         update.message.reply_text("Korvessa.")
 
