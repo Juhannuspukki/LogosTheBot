@@ -12,6 +12,7 @@ import logosmenu
 import logosnysse
 import logostelok
 import logosdrinks
+import logoswayfinding
 import logosaccounts
 import logostextonly
 import logosquestionables
@@ -84,7 +85,9 @@ def main():
     dp.add_handler(CommandHandler("xkcd", logosxkcd.xkcd, pass_args=True))
 
     dp.add_handler(CallbackQueryHandler(miinaharava.button))
+    dp.add_handler(CallbackQueryHandler(logoswayfinding.button))
     dp.add_handler(logosnysse.nysset)
+    dp.add_handler(logoswayfinding.tech2)
     dp.add_handler(logosdrinks.conv_handler)
     dp.add_handler(MessageHandler(Filters.text, logosecho.echo))
     dp.add_handler(MessageHandler(Filters.location, logosecho.location))

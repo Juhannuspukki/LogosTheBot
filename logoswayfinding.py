@@ -122,7 +122,7 @@ def cancel(bot, update):
 
 
 tech2 = ConversationHandler(
-    entry_points=[CommandHandler('nysse', start, pass_args=True)],
+    entry_points=[CommandHandler('moveme', start, pass_args=True)],
 
     states={
         SORSA: [MessageHandler(Filters.location, startlocationquery), MessageHandler(Filters.text, startlocationtextquery)],
