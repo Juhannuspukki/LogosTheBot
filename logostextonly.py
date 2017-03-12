@@ -20,6 +20,8 @@ def help(bot, update):
                               "\n/cam - Herwantacam"
                               "\n/telok <search> - Search for items in the TELOK database"
                               "\n/nysse <line> - Find the location of a nysse near you"
+                              "\n/moveme <a/d> <hour> <minute> - Going places. Optional args for arrival/departure and "
+                              "time. For example /moveme a 16 00 if you want to be somewhere at 16:00 o'clock."
                               "\n/beersweeper - Play a game of beersweeper. It's almost like minesweeper, but not quite"
                               "\n/beersweepersettings - Adjust the settings of your beersweeper board"
                               "\n\n/set <x> - set the timer to x seconds. Default: 7 minutes"
@@ -100,7 +102,7 @@ def log(bot, update):
                               "a typo in /telok\n\nUpdate 23/1/17: /open actually does stuff and things now. Camera "
                               "hw changes.\n\nUpdate 2/2/2017: added /nysse, fixed an issue with /telok.\n\nUpdate 3/2"
                               "/2017: fixed an issue with /nysse.\n\nUpdate 25/2/2017: added /beersweeper, "
-                              "added /beersweepersettings.")
+                              "added /beersweepersettings.\n\nUpdate 12/3/2017: added /moveme.")
 
 
 def avoinna(bot, update):
