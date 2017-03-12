@@ -1,159 +1,118 @@
 from telegram.ext import ConversationHandler, CommandHandler, MessageHandler, Filters
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
-from math import radians, cos, sin, asin, sqrt
-from datetime import datetime, timedelta
-import json
-import requests
-import operator
-
+from telegram import ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
+from datetime import datetime
+import datetime as dt
+import googlemaps
 
 SORSA, DESTINATION = range(2)
-beginning = 0
+beginning = None
+time = "d", datetime.now()
 
 
-class Pysäkki:
-    def __init__(self, latitude, longitude, name, short, tariffzone):
-        self.lat = latitude
-        self.long = longitude
-        self.name = name
-        self.short = short
-        self.tariffzone = tariffzone
-        self.kmtoend = 0
-        self.kmtostart = 0
+def start(bot, update, args):
+    if args:
+        try:
+            if args[0] == "a" or args[0] == "d":
+                global time
+                time = args[0], datetime.combine(datetime.now().date(), dt.time(int(args[1]), int(args[2])))
+                bot.sendMessage(chat_id=update.message.chat_id, text="Please send your current location.")
+                return SORSA
+            else:
+                raise TypeError
+        except (ValueError, IndexError, TypeError) as error:
+            update.message.reply_text("Usage: /moveme <a/d> <hour> <minute>")
+            return
 
-    def distancetoend(self, coord):
-        self.kmtoend = haversine(self, coord)*sqrt(2)
-
-    def distancetobeginning(self, coord):
-        self.kmtostart = haversine(self, coord)*sqrt(2)
-
-
-class Route:
-    def __init__(self, ad, stops):
-        self.ad = ad
-        self.stops = stops
-
-    def validate(self, entrancestop, exitstop, currenttime):
-        check1 = False
-        for i in range(len(self.stops)):
-            if entrancestop.short == self.stops[i]["stopid"]:
-                departtime = self.stops[i]["departtime"]
-                try:
-                    departtime = datetime.strptime(self.stops[i]["departtime"], "%H:%M:%S").time()
-                except ValueError:
-                    departtime = "00" + departtime[2:]
-                    departtime = datetime.strptime(departtime, "%H:%M:%S").time()
-                if (currenttime + timedelta(hours=9)).time() > departtime > currenttime.time():
-                    check1 = True
-            if exitstop.short == self.stops[i]["stopid"] and check1 is True:
-                return self
-
-    def departuretime(self, stop):
-        for i in range(len(self.stops)):
-            if stop.short == self.stops[i]["stopid"]:
-                return self.stops[i]["departtime"]
-
-
-def haversine(ett, två):
-    lon1, lat1, lon2, lat2 = map(radians, [ett.long, ett.lat, två.longitude, två.latitude])
-    # haversine formula
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * asin(sqrt(a))
-    return 6367 * c
-
-
-def start(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text="Please send your current location.")
-
     return SORSA
 
 
-def locationquery(bot, update):
+def startlocationquery(bot, update):
     global beginning
-    beginning = update.message.location
+    beginning = str(update.message.location.latitude) + "," + str(update.message.location.longitude)
     update.message.reply_text("Please send your destination.")
 
     return DESTINATION
 
 
-def hitchhikersguidetonysse(bot, update):
-    pysäkit = []
+def startlocationtextquery(bot, update):
+    global beginning
+    beginning = update.message.text
+    update.message.reply_text("Please send your destination.")
 
-    end = update.message.location
+    return DESTINATION
 
-    url = "http://data.itsfactory.fi/journeys/api/1/stop-points"
-    x = requests.get(url)
-    x = x.content.decode("utf-8")
-    simplex = json.loads(x, encoding='utf-8')
 
-    for i in range(len((simplex["body"]))):
-        thisstop = simplex["body"][i]
-        location = thisstop["location"].split(",")
-        stopobject = Pysäkki(float(location[0]), float(location[1]), thisstop["name"],
-                             thisstop["shortName"], thisstop["tariffZone"])
-        stopobject.distancetobeginning(beginning)
-        stopobject.distancetoend(end)
-        pysäkit.append(stopobject)
+def endlocationquery(bot, update):
+    end = str(update.message.location.latitude) + "," + str(update.message.location.longitude)
+    return hitchhikersguidetonysse(bot, update, end)
 
-    cmpfun = operator.attrgetter("kmtostart")
-    pysäkit.sort(key=cmpfun)
 
-    starttialähimmät = pysäkit[:9]
+def endlocationtextquery(bot, update):
+    end = update.message.text
+    return hitchhikersguidetonysse(bot, update, end)
 
-    cmpfun = operator.attrgetter("kmtoend")
-    pysäkit.sort(key=cmpfun)
 
-    endiälähimmät = pysäkit[:9]
+def hitchhikersguidetonysse(bot, update, end):
+    chatid = str(update.message.chat_id)
 
-    listofroutes = loadroutes()
+    gmaps = googlemaps.Client(key='AIzaSyA1VGRpW2jVM0rgb6WIxQlqRIcb5qy_GYM')
 
-    validroutes = []
-    validstops = []
+    # Request directions via public transit
+    try:
+        if time[0] == "d":
+            directions = gmaps.directions(beginning, end, mode="transit", departure_time=time[1], alternatives=True)
+        if time[0] == "a":
+            directions = gmaps.directions(beginning, end, mode="transit", arrival_time=time[1], alternatives=True)
 
-    for i in range(len(endiälähimmät)):
-        print(endiälähimmät[i].short, ", ", sep="", end="")
-    for i in range(len(endiälähimmät)):
-        print(starttialähimmät[i].short, ", ", sep="", end="")
+    except googlemaps.exceptions.ApiError:
+        bot.sendMessage(chat_id=chatid, text="Your search was sadly unfruitful. Try some other location or address.")
+        return ConversationHandler.END
 
-    now = datetime.now()
+    textvar = ""
+    biggerbuttonlist = []
+    for items in directions:
+        endzonecoords = str(items["legs"][0]["steps"][-1]["end_location"]["lat"]) + "," + \
+                        str(items["legs"][0]["steps"][-1]["end_location"]["lng"])
 
-    for i in range(len(listofroutes)):
-        for startx in range(len(starttialähimmät)):
-            for endx in range(len(endiälähimmät)):
-                essence = listofroutes[i].validate(starttialähimmät[startx], endiälähimmät[endx], now)
-                if essence:
-                    if essence not in validroutes:
-                        validroutes.append(essence.departuretime(starttialähimmät[startx]))
-                        validstops.append(starttialähimmät[startx])
+        finaldestination = [InlineKeyboardButton("Destination", callback_data=endzonecoords)]
 
-    print(validroutes)
-    printvar = ""
-    for i in range(len(validstops)):
-        printvar += validstops[i].name + ", " + str(validstops[i].kmtostart) + "\n"
+        for z in items["legs"][0]["steps"]:
+            textvar += z["html_instructions"] + ", " + z["duration"]["text"] + "\n"
+            try:
+                transdetdepart = z["transit_details"]["departure_stop"]
+                transdetarrive = z["transit_details"]["arrival_stop"]
+                textvar += "Line " + z["transit_details"]["line"]["short_name"] + " from "
+                textvar += transdetdepart["name"] + " (" + z["transit_details"]["departure_time"]["text"] + ") to "
+                textvar += transdetarrive["name"] + " (" + z["transit_details"]["arrival_time"]["text"] + ")\n"
 
-    update.message.reply_text(printvar)
+                x = transdetdepart["name"]
+                y = transdetarrive["name"]
+
+                departcoords = str(transdetdepart["location"]["lat"]) + "," + str(transdetdepart["location"]["lng"])
+                arrivalcoords = str(transdetarrive["location"]["lat"]) + "," + str(transdetarrive["location"]["lng"])
+                buttonlist = [InlineKeyboardButton(x, callback_data=departcoords),
+                              InlineKeyboardButton(y, callback_data=arrivalcoords)]
+                biggerbuttonlist.append(buttonlist)
+            except KeyError:
+                pass
+
+        biggerbuttonlist.append(finaldestination)
+        reply_markup = InlineKeyboardMarkup(biggerbuttonlist)
+
+        bot.sendMessage(chat_id=chatid, text=textvar, reply_markup=reply_markup)
+
+        textvar = ""
+        biggerbuttonlist = []
 
     return ConversationHandler.END
 
 
-def loadroutes():
-    with open("exec.json", "r") as fp:
-        one = json.load(fp)
-
-    two = []
-
-    for key in one.keys():
-        two.append(Route(key, one[key]))
-
-    return two
-
-
-def validateexceptions():
-    with open("nyssemaisteri.json", "r") as fp:
-        nyssemaisteri = json.load(fp)
-    return nyssemaisteri
+def button(bot, update):
+    query = update.callback_query
+    ad = str(query.message.chat_id)
+    coords = query.data.split(",")
+    bot.sendLocation(chat_id=ad, latitude=coords[0], longitude=coords[1])
 
 
 def cancel(bot, update):
@@ -163,13 +122,13 @@ def cancel(bot, update):
 
 
 tech2 = ConversationHandler(
-        entry_points=[CommandHandler('nysse', start)],
+    entry_points=[CommandHandler('nysse', start, pass_args=True)],
 
-        states={
-            SORSA: [MessageHandler(Filters.location, locationquery)],
-            DESTINATION: [MessageHandler(Filters.location, hitchhikersguidetonysse)],
+    states={
+        SORSA: [MessageHandler(Filters.location, startlocationquery), MessageHandler(Filters.text, startlocationtextquery)],
+        DESTINATION: [MessageHandler(Filters.location, endlocationquery), MessageHandler(Filters.text, endlocationtextquery)],
 
-        },
+    },
 
-        fallbacks=[CommandHandler('cancel', cancel)]
-    )
+    fallbacks=[CommandHandler('cancel', cancel)]
+)
