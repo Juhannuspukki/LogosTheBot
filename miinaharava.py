@@ -89,12 +89,12 @@ def generatekeyboard(lauta, n):
         for a in range(8):
             if lauta.item((i, a)).hidden is False:
                 if lauta.item((i, a)).numero == 0:
-                    toinenlista.append(InlineKeyboardButton(" ", callback_data=(str(i) + str(a))))
+                    toinenlista.append(InlineKeyboardButton(" ", callback_data=("ö" + str(i) + str(a))))
                 else:
                     toinenlista.append(
-                        InlineKeyboardButton(str(lauta.item((i, a)).numero), callback_data=(str(i) + str(a))))
+                        InlineKeyboardButton(str(lauta.item((i, a)).numero), callback_data=("ö" + str(i) + str(a))))
             else:
-                toinenlista.append(InlineKeyboardButton(emoji.emojize(":beer_mug:"), callback_data=(str(i) + str(a))))
+                toinenlista.append(InlineKeyboardButton(emoji.emojize(":beer_mug:"), callback_data=("ö" + str(i) + str(a))))
 
         lista.append(toinenlista)
         toinenlista = []
@@ -250,8 +250,8 @@ def button(bot, update):
 
     p = 0
 
-    x = int(query.data[0])
-    y = int(query.data[1])
+    x = int(query.data[1])
+    y = int(query.data[2])
 
     for i in range(n):
         for a in range(8):

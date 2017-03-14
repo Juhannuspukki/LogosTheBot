@@ -1,5 +1,6 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, RegexHandler
 from telegram import ParseMode
+import emoji
 import json
 import logging
 import logosshorties
@@ -84,7 +85,7 @@ def main():
     dp.add_handler(CommandHandler("unset", logostimer.unset))
     dp.add_handler(CommandHandler("xkcd", logosxkcd.xkcd, pass_args=True))
 
-    dp.add_handler(CallbackQueryHandler(miinaharava.button))
+    dp.add_handler(CallbackQueryHandler(miinaharava.button, pattern=emoji.emojize('^ö.*$')))
     dp.add_handler(CallbackQueryHandler(logoswayfinding.button))
     dp.add_handler(logosnysse.nysset)
     dp.add_handler(logoswayfinding.tech2)
