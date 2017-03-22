@@ -6,7 +6,7 @@ import googlemaps
 
 SORSA, DESTINATION = range(2)
 beginning = None
-time = "d", datetime.now()
+time = "d", None
 
 
 def start(bot, update, args):
@@ -58,12 +58,17 @@ def hitchhikersguidetonysse(bot, update, end):
 
     gmaps = googlemaps.Client(key='AIzaSyA1VGRpW2jVM0rgb6WIxQlqRIcb5qy_GYM')
 
+    if not time[1]:
+        realtime = "d", datetime.now()
+    else:
+        realtime = time
+
     # Request directions via public transit
     try:
-        if time[0] == "d":
-            directions = gmaps.directions(beginning, end, mode="transit", departure_time=time[1], alternatives=True)
-        if time[0] == "a":
-            directions = gmaps.directions(beginning, end, mode="transit", arrival_time=time[1], alternatives=True)
+        if realtime[0] == "d":
+            directions = gmaps.directions(beginning, end, mode="transit", departure_time=realtime[1], alternatives=True)
+        if realtime[0] == "a":
+            directions = gmaps.directions(beginning, end, mode="transit", arrival_time=realtime[1], alternatives=True)
 
     except googlemaps.exceptions.ApiError:
         bot.sendMessage(chat_id=chatid, text="Your search was sadly unfruitful. Try some other location or address.")
@@ -104,6 +109,9 @@ def hitchhikersguidetonysse(bot, update, end):
 
         textvar = ""
         biggerbuttonlist = []
+
+    global time
+    time = "d", None
 
     return ConversationHandler.END
 
