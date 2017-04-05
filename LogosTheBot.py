@@ -17,6 +17,7 @@ import logoswayfinding
 import logosaccounts
 import logostextonly
 import logosquestionables
+import logosrelay
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -90,6 +91,7 @@ def main():
     dp.add_handler(logosnysse.nysset)
     dp.add_handler(logoswayfinding.tech2)
     dp.add_handler(logosdrinks.conv_handler)
+    dp.add_handler(logosrelay.relayswitch)
     dp.add_handler(MessageHandler(Filters.text, logosecho.echo))
     dp.add_handler(MessageHandler(Filters.location, logosecho.location))
 
