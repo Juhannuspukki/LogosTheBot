@@ -18,7 +18,7 @@ import logosaccounts
 import logostextonly
 import logosquestionables
 import logosrelay
-
+import logosspam
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -50,8 +50,11 @@ def main():
     updater = Updater(mastercontrol["updater"])
     dp = updater.dispatcher
 
+    logosspam.loadspams(dp.job_queue, dp.chat_data)
+
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("accounthelp", logostextonly.accounthelp))
+    dp.add_handler(CommandHandler("advanced", logostextonly.advanced))
     dp.add_handler(CommandHandler("alho", logosquestionables.alho))
     dp.add_handler(CommandHandler("android", logosshorties.android))
     dp.add_handler(CommandHandler("apple", logosshorties.apple))
@@ -78,12 +81,14 @@ def main():
     dp.add_handler(CommandHandler("alaoviauki", logospi.alaoviauki))
     dp.add_handler(CommandHandler("promillet", logosdrinks.promillet))
     dp.add_handler(CommandHandler("set", logostimer.set, pass_args=True, pass_job_queue=True))
+    dp.add_handler(CommandHandler("spam", logosspam.spam, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("source", source))
     dp.add_handler(CommandHandler("swearjar", logosecho.swearjar))
     dp.add_handler(CommandHandler("telok", logostelok.telok, pass_args=True))
     dp.add_handler(CommandHandler("thx", logosquestionables.thx))
     dp.add_handler(CommandHandler("unset", logostimer.unset))
+    dp.add_handler(CommandHandler("unspam", logosspam.unspam, pass_chat_data=True))
     dp.add_handler(CommandHandler("xkcd", logosxkcd.xkcd, pass_args=True))
 
     dp.add_handler(CallbackQueryHandler(miinaharava.button, pattern=emoji.emojize('^ö.*$')))

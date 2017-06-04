@@ -9,6 +9,14 @@ def newton(bot, update):
     update.message.reply_text(juvenes())
 
 
+def reaktori(bot, update):
+    update.message.reply_text(returnreaktori())
+
+
+def hertsi(bot, update):
+    update.message.reply_text(returnhertsi())
+
+
 def juvenes(KitchenId="6", MenuTypeId="60"):
     try:
         date = str(datetime.date.today())
@@ -41,28 +49,16 @@ def juvenes(KitchenId="6", MenuTypeId="60"):
     return teksti
 
 
-def menu(bot, update):
-    päämuuttuja = "Newtonissa tarjolla:\n\n"
-
+def returnreaktori(compact=False):
     date = str(datetime.date.today())
-    day = date[8:]
-    month = date[5:7]
-    year = date[:4]
 
-    päämuuttuja += juvenes("6", "60")
-    päämuuttuja += "Ravintola Newton palvelee yleensä ma-to 10.30-16.00 ja pe 10.30-15.00" + "\n\n" + "Sååsibaarissa:\n\n"
-    päämuuttuja += juvenes("60038", "77")
-    päämuuttuja += "SÅÅSBAR on avoinna ma-pe 10.30-19.00" + "\n\n" + "Fusarissa:\n\n"
-    päämuuttuja += juvenes("60038", "3")
-    päämuuttuja += "Fusion Kitchen on avoinna ma-pe 10.30-18.45, Café Konehuone palvelee ma-pe klo 8-19" + "\n"
-
-    päämuuttuja += "\n" + "Reaktori tarjoaa:" + "\n\n"
     url = "http://www.amica.fi/modules/json/json/Index?costNumber=0812&language=fi"
     x = requests.get(url)
     x = x.content.decode("utf-8")
 
     x = x.replace("  ", "")
 
+    teksti = ""
     menu = json.loads(x, encoding='utf-8')
     a = menu["MenusForDays"]
     for i in range(len(a)):
@@ -71,16 +67,37 @@ def menu(bot, update):
             c = b["SetMenus"]
             for ö in range(len(c)):
                 d = c[ö]
-                if d["Name"] not in päämuuttuja:
-                    päämuuttuja += d["Name"] + ": " + "\n"
-                e = d["Components"]
-                for w in range(len(e)):
-                    ruokalaji = e[w]
-                    päämuuttuja += "    • " + ruokalaji + "\n"
-            päämuuttuja = päämuuttuja.replace("xc2xb4", "'")
-            päämuuttuja += "Reaktori on avoinna " + a[i]["LunchTime"] + "\n"
+                if compact is True:
+                    if d["Name"] == "Linjasto":
+                        if d["Name"] not in teksti:
+                            teksti += d["Name"] + ": " + "\n"
+                        e = d["Components"]
+                        for w in range(len(e)):
+                            ruokalaji = e[w]
+                            teksti += "    • " + ruokalaji + "\n"
+                else:
+                    if d["Name"] not in teksti:
+                        teksti += d["Name"] + ": " + "\n"
+                    e = d["Components"]
+                    for w in range(len(e)):
+                        ruokalaji = e[w]
+                        teksti += "    • " + ruokalaji + "\n"
+            teksti = teksti.replace("xc2xb4", "'")
+            aukioloaika = str(a[i]["LunchTime"])
 
-    päämuuttuja += "\n" + "Hertsissä tänään:" + "\n\n"
+    if not teksti:
+        teksti = "Ei mitään syötävää!\n\n"
+
+    teksti += "Reaktori on avoinna " + aukioloaika + "\n"
+    return teksti
+
+
+def returnhertsi(compact=False):
+    date = str(datetime.date.today())
+    day = date[8:]
+    month = date[5:7]
+    year = date[:4]
+
     url = "http://www.sodexo.fi/ruokalistat/output/daily_json/12812/" + year + "/" + month + "/" + day + "/fi"
     x = requests.get(url)
     x = x.content.decode("utf-8")
@@ -90,25 +107,57 @@ def menu(bot, update):
 
     vanhouten = {}
     keylist = []
+    teksti = ""
     for i in range(len(menu)):
         ööö = menu[i]
         try:
             temp_variable = "    • " + ööö["title_fi"] + " " + ööö["properties"] + "\n"
-            vanhouten[temp_variable] = ööö["category"] + ": "
         except KeyError:
             temp_variable = "    • " + ööö["title_fi"] + "\n"
+
+        if compact is True:
+            if ööö["category"] == "Popular":
+                vanhouten[temp_variable] = ööö["category"] + ": "
+        else:
             vanhouten[temp_variable] = ööö["category"] + ": "
 
     for key in sorted(vanhouten.keys()):
         if vanhouten[key] not in keylist:
-            päämuuttuja += vanhouten[key] + "\n" + key
+            teksti += vanhouten[key] + "\n" + key
             keylist.append(vanhouten[key])
         else:
-            päämuuttuja += key
+            teksti += key
+
+    if not teksti:
+        teksti = "Ei mitään syötävää!\n\n"
+
+    return teksti
+
+
+def returnmenu():
+    päämuuttuja = "Newtonissa tarjolla:\n\n"
+
+    päämuuttuja += juvenes("6", "60")
+    päämuuttuja += "Ravintola Newton palvelee yleensä ma-to 10.30-16.00 ja pe 10.30-15.00" + "\n\n" + "Sååsibaarissa:\n\n"
+    päämuuttuja += juvenes("60038", "77")
+    päämuuttuja += "SÅÅSBAR on avoinna ma-pe 10.30-19.00" + "\n\n" + "Fusarissa:\n\n"
+    päämuuttuja += juvenes("60038", "3")
+    päämuuttuja += "Fusion Kitchen on avoinna ma-pe 10.30-18.45, Café Konehuone palvelee ma-pe klo 8-19" + "\n"
+
+    päämuuttuja += "\n" + "Reaktori tarjoaa:" + "\n\n"
+    päämuuttuja += returnreaktori(True)  # reaktorin tiedot
+
+    päämuuttuja += "\n" + "Hertsissä tänään:" + "\n\n"
+
+    päämuuttuja += returnhertsi(True)  # hertsin tiedot
 
     päämuuttuja = päämuuttuja.replace("  ", " ")
     päämuuttuja += "Hertsi on avoinna Ma-Pe 10.30 - 15.00, kahvila Bitti palvelee klo 08.00 - 17.00 Ma-Pe"
-    update.message.reply_text(päämuuttuja)
+    return päämuuttuja
+
+
+def menu(bot, update):
+    update.message.reply_text(returnmenu())
 
 
 def liiga(bot, update):

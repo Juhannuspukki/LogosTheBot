@@ -3,20 +3,20 @@ import json
 import datetime
 
 
-def help(bot, update):
+def advanced(bot, update):
     update.message.reply_text("Logos Mk XIV, at your service! Usage:"
                               "\n\n/liiga - SM-liigan sarjataulukko"
                               "\n/menu - TTY:n päivän ruokalistat"
-                              "\n/open - check if a service is available right now at the campus"
-                              "\n/xkcd - gives you a random xkcd comic to read"
+                              "\n/open - Check if a service is available right now at the campus (unreliable)"
+                              "\n/xkcd - Gives you a random xkcd comic to read"
                               "\n/hype - 11/28/16"
-                              "\n/laulu - lyrics for a random teekkari song"
-                              "\n/swearjar - view the contents of the swear jar"
-                              "\n/skål - logs a drink that contains 12g, 26g, 32g or 0g of alcohol to the system"
-                              "\n/promillet - how drunk you are at the moment... at least in theory"
-                              "\n/accounthelp - information concerning accounts"
-                              "\n/log - show the update log"
-                              "\n/latin <search> - Search a finnish phrase in the latin dictionary"
+                              "\n/laulu - Lyrics for a random teekkari song"
+                              "\n/swearjar - View the contents of the swear jar"
+                              "\n/skål - Logs a drink that contains 12g, 26g, 32g or 0g of alcohol to the system"
+                              "\n/promillet - How drunk you are at the moment... at least in theory"
+                              "\n/accounthelp - Information concerning accounts"
+                              "\n/log - Show the update log"
+                              "\n/latin <search> - Search for a finnish phrase in the latin dictionary"
                               "\n/cam - Herwantacam"
                               "\n/telok <search> - Search for items in the TELOK database"
                               "\n/nysse <line> - Find the location of a nysse near you"
@@ -24,9 +24,26 @@ def help(bot, update):
                               "time. For example /moveme a 16 00 if you want to be somewhere at 16:00 o'clock."
                               "\n/beersweeper - Play a game of beersweeper. It's almost like minesweeper, but not quite"
                               "\n/beersweepersettings - Adjust the settings of your beersweeper board"
-                              "\n\n/set <x> - set the timer to x seconds. Default: 7 minutes"
-                              "\n/unset - cancel the timer"
+                              "\n\n/set <x> - Set the timer to x seconds. Default: 7 minutes"
+                              "\n/unset - Cancel the timer"
+                              "\n\n/spam - To receive a daily newsletter"
+                              "\n/unspam - Cancel the newsletter"
+                              "\n/spamsettings - Customize newsletter content"
                               "\n\n/kääretorttu")
+
+
+def help(bot, update):
+    update.message.reply_text("Logos Mk XIV, at your service! Usage:"
+                              "\n/menu - TTY:n päivän ruokalistat"
+                              "\n/skål - Logs a drink that contains 12g, 26g, 32g or 0g of alcohol to the system"
+                              "\n/promillet - How drunk you are at the moment... at least in theory"
+                              "\n/accounthelp - Information concerning accounts"
+                              "\n/nysse <line> - Find the location of a nysse near you"
+                              "\n/moveme <a/d> <hour> <minute> - Going places. Optional args for arrival/departure and "
+                              "time. For example /moveme a 16 00 if you want to be somewhere at 16:00 o'clock."
+                              "\n\n/spam - To receive a daily newsletter"
+                              "\n/spamsettings - Customize newsletter content"
+                              "\n\nFor more options, see /advanced")
 
 
 def accounthelp(bot, update):
@@ -102,7 +119,8 @@ def log(bot, update):
                               "a typo in /telok\n\nUpdate 23/1/17: /open actually does stuff and things now. Camera "
                               "hw changes.\n\nUpdate 2/2/2017: added /nysse, fixed an issue with /telok.\n\nUpdate 3/2"
                               "/2017: fixed an issue with /nysse.\n\nUpdate 25/2/2017: added /beersweeper, "
-                              "added /beersweepersettings.\n\nUpdate 12/3/2017: added /moveme.")
+                              "added /beersweepersettings.\n\nUpdate 12/3/2017: added /moveme.\n\n Update 5/6/2017: "
+                              "added /spam, /unspam, /spamsettings.")
 
 
 def avoinna(bot, update):
