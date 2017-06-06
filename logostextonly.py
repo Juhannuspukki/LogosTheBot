@@ -42,6 +42,7 @@ def help(bot, update):
                               "\n/moveme <a/d> <hour> <minute> - Going places. Optional args for arrival/departure and "
                               "time. For example /moveme a 16 00 if you want to be somewhere at 16:00 o'clock."
                               "\n\n/spam - To receive a daily newsletter"
+                              "\n/unspam - Cancel the newsletter"
                               "\n/spamsettings - Customize newsletter content"
                               "\n\nFor more options, see /advanced")
 

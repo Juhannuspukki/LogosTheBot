@@ -49,8 +49,9 @@ def main():
         mastercontrol = json.load(fp)
     updater = Updater(mastercontrol["updater"])
     dp = updater.dispatcher
+    filename = mastercontrol["filename"]
 
-    logosspam.loadspams(dp.job_queue, dp.chat_data)
+    logosspam.loadspams(dp.job_queue, dp.chat_data, filename)
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("accounthelp", logostextonly.accounthelp))
@@ -97,6 +98,7 @@ def main():
     dp.add_handler(logoswayfinding.tech2)
     dp.add_handler(logosdrinks.conv_handler)
     dp.add_handler(logosrelay.relayswitch)
+    dp.add_handler(logosspam.createspam)
     dp.add_handler(MessageHandler(Filters.text, logosecho.echo))
     dp.add_handler(MessageHandler(Filters.location, logosecho.location))
 
