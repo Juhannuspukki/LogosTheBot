@@ -54,6 +54,7 @@ def endlocationtextquery(bot, update):
 
 
 def hitchhikersguidetonysse(bot, update, end):
+    global time
     chatid = str(update.message.chat_id)
 
     gmaps = googlemaps.Client(key='AIzaSyA1VGRpW2jVM0rgb6WIxQlqRIcb5qy_GYM')
@@ -110,7 +111,6 @@ def hitchhikersguidetonysse(bot, update, end):
         textvar = ""
         biggerbuttonlist = []
 
-    global time
     time = "d", None
 
     return ConversationHandler.END

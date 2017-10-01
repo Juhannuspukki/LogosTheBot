@@ -49,9 +49,10 @@ def main():
         mastercontrol = json.load(fp)
     updater = Updater(mastercontrol["updater"])
     dp = updater.dispatcher
-    filename = mastercontrol["filename"]
+    spamfile = mastercontrol["filename"]
+    logosspam.setfile(spamfile)
 
-    logosspam.loadspams(dp.job_queue, dp.chat_data, filename)
+    logosspam.loadspams(dp.job_queue, dp.chat_data)
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("accounthelp", logostextonly.accounthelp))
@@ -65,6 +66,7 @@ def main():
     dp.add_handler(CommandHandler("createaccount", logosaccounts.createaccount, pass_args=True))
     dp.add_handler(CommandHandler("deleteaccount", logosaccounts.deleteaccount))
     dp.add_handler(CommandHandler("help", logostextonly.help))
+    dp.add_handler(CommandHandler("hertsi", logosmenu.hertsi))
     dp.add_handler(CommandHandler("hype", logosquestionables.hype))
     dp.add_handler(CommandHandler("hyvinsanottu", logosquestionables.hyvin))
     dp.add_handler(CommandHandler("id", logosshorties.id))
@@ -81,6 +83,7 @@ def main():
     dp.add_handler(CommandHandler("open", logostextonly.avoinna))
     dp.add_handler(CommandHandler("alaoviauki", logospi.alaoviauki))
     dp.add_handler(CommandHandler("promillet", logosdrinks.promillet))
+    dp.add_handler(CommandHandler("reaktori", logosmenu.reaktori))
     dp.add_handler(CommandHandler("set", logostimer.set, pass_args=True, pass_job_queue=True))
     dp.add_handler(CommandHandler("spam", logosspam.spam, pass_job_queue=True, pass_chat_data=True))
     dp.add_handler(CommandHandler("start", start))
@@ -91,6 +94,7 @@ def main():
     dp.add_handler(CommandHandler("unset", logostimer.unset))
     dp.add_handler(CommandHandler("unspam", logosspam.unspam, pass_chat_data=True))
     dp.add_handler(CommandHandler("xkcd", logosxkcd.xkcd, pass_args=True))
+    dp.add_handler(CommandHandler("weather", logosspam.test))
 
     dp.add_handler(CallbackQueryHandler(miinaharava.button, pattern=emoji.emojize('^ö.*$')))
     dp.add_handler(CallbackQueryHandler(logoswayfinding.button))

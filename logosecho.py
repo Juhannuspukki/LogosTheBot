@@ -36,7 +36,7 @@ def echo(bot, update):
 
     with open('saves.json', 'r') as fp:
         swearjardict = json.load(fp)
-    with open('wordlists.json', 'r') as fp:
+    with open('wordlists.json', 'r', encoding='utf8') as fp:
         wordlists = json.load(fp)
 
     if chat_id not in swearjardict:

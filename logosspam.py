@@ -8,10 +8,16 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 
 
 NIMIPÄIVÄ, RAVINTOLA, SÄÄ, SIJAINTI, TIME = range(5)
+spamfile = "logosspams.json"
+
+
+def setfile(filename):
+    global spamfile
+    spamfile = filename
 
 
 def includer(bot, job):
-    with open('logosspams.json', 'r') as fie:
+    with open(spamfile, 'r') as fie:
         accounts = json.load(fie)
 
     chat_id = str(job.context)
@@ -19,18 +25,35 @@ def includer(bot, job):
     for i in range(len(accounts)):
         if accounts[i]["chat_id"] == chat_id:
             if accounts[i]["namedays"] == "true":
-                päiväspämmi += "Namedays today: " + namedays() + "\n\n"
+                päiväspämmi += "🎉: " + namedays() + "\n\n"
             if accounts[i]["weather"] == "true":
                 päiväspämmi += säätiedot(accounts[i])
-            if accounts[i]["restaurant"] == "newton":
+            if accounts[i]["restaurant"] == "Newton":
                 päiväspämmi += logosmenu.juvenes()
-            if accounts[i]["restaurant"] == "reaktori":
+            if accounts[i]["restaurant"] == "Reaktori":
                 päiväspämmi += logosmenu.returnreaktori()
-            if accounts[i]["restaurant"] == "hertsi":
+            if accounts[i]["restaurant"] == "Hertsi":
                 päiväspämmi += logosmenu.returnhertsi()
+            if accounts[i]["xkcd"] == "true":
+                päiväspämmi += xkcdspam()
 
             bot.sendMessage(job.context, text=päiväspämmi)
             return
+
+
+def xkcdspam():
+    today = datetime.today().weekday()
+    info = ""
+    if today == 0 or today == 2 or today == 4:
+        url = "https://xkcd.com/info.0.json"
+        x = requests.get(url)
+        x = x.content.decode("utf-8")
+        feed = json.loads(x)
+        info += "\n\n" + feed["title"] + "\n\n"
+        info += feed["title"] + "\n\n"
+        info += feed["alt"] + "\n\n"
+        info += feed["img"]
+    return info
 
 
 def namedays():
@@ -48,7 +71,7 @@ def namedays():
 
 def translateicon(icon, moonp):
     keys = {"clear-day": "☀️", "clear-night": moonphase(moonp), "snow": "🌨", "rain": "🌧", "sleet": "🌨", "wind": "💨",
-            "fog": "🌫", "cloudy": "☁️️", "partly-cloudy-day": "⛅", "partly-cloudy night": "⛅️"}
+            "fog": "🌫", "cloudy": "☁️️", "partly-cloudy-day": "⛅", "partly-cloudy-night": "⛅️"}
     try:
         return keys[icon]
     except KeyError:
@@ -71,11 +94,11 @@ def moonphase(phase):
         return "🌗"
 
 
-def hourly(syöte, moonp):
+def hourly(startoffset, endoffset, syöte, moonp):
     sää = ""
     now = datetime.now().hour
 
-    for i in range(now, now+12):
+    for i in range(now+startoffset, now+endoffset):
         x = i
         if x > 23:
             x -= 24
@@ -84,7 +107,7 @@ def hourly(syöte, moonp):
             x = "0" + x
         sää += translatenumber(int(x[0]))
     sää += "\n"
-    for i in range(now, now+12):
+    for i in range(now+startoffset, now+endoffset):
         x = i
         if x > 23:
             x -= 24
@@ -93,7 +116,7 @@ def hourly(syöte, moonp):
             x = "0" + x
         sää += translatenumber(int(x[1]))
     sää += "\n"
-    for i in range(12):
+    for i in range(startoffset, endoffset):
         sää += translateicon(syöte[i]["icon"], moonp)
     return sää
 
@@ -110,11 +133,11 @@ def säätiedot(account):
     sää += feed["currently"]["summary"] + "\n🌡: " + str(feed["currently"]["temperature"]) + "ºC "
     sää += "(" + str(feed["currently"]["apparentTemperature"]) + "ºC)\n"
     sää += "💧: " + str(feed["currently"]["dewPoint"]) + "ºC & "  # kastepiste
-    sää += str(feed["currently"]["humidity"]*100)[:2] + " %\n"  # kosteus-%
+    sää += str(round(feed["currently"]["humidity"]*100, 1)) + " %\n"  # kosteus-%
     sää += "☔️: " + str(feed["currently"]["precipIntensity"]) + " mm/h & "
-    sää += str(feed["currently"]["precipProbability"]*100) + " %\n"  # kosteus-%
+    sää += str(round(feed["currently"]["precipProbability"]*100, 1)) + " %\n"  # kosteus-%
 
-    sää += "☁️: " + str(feed["currently"]["cloudCover"]*100) + " %\n"
+    sää += "☁️: " + str(round(feed["currently"]["cloudCover"]*100, 1)) + " %\n"
     sää += "💨️️: " + str(feed["currently"]["windSpeed"]) + "m/s "
     windbearing = feed["currently"]["windBearing"]
     if windbearing < 22.5 or windbearing > 337.5:
@@ -141,17 +164,24 @@ def säätiedot(account):
     sää += "(" + str(feed["daily"]["data"][0]["apparentTemperatureMax"]) + "ºC)"
     sää += "\n📉🌡: " + str(feed["daily"]["data"][0]["temperatureMin"]) + "ºC "
     sää += "(" + str(feed["daily"]["data"][0]["apparentTemperatureMin"]) + "ºC)"
-    sää += "\n☔️: " + str(feed["daily"]["data"][0]["precipProbability"]*100) + " %\n"
-    sää += "\n⬆️☀: ️" + str(datetime.fromtimestamp(feed["daily"]["data"][0]["sunriseTime"]).strftime("%H:%M:%S"))
-    sää += "\n⬇️️☀: ️" + str(datetime.fromtimestamp(feed["daily"]["data"][0]["sunsetTime"]).strftime("%H:%M:%S"))
-    sää += "\n\n12-hour forecast:\n"
-    sää += hourly(feed["hourly"]["data"], moonp)
+    sää += "\n☔️: " + str(round(feed["daily"]["data"][0]["precipProbability"]*100, 1)) + " %\n"
+    sää += "\n⬆️☀️: ️" + str(datetime.fromtimestamp(feed["daily"]["data"][0]["sunriseTime"]).strftime("%H:%M:%S"))
+    sää += "\n⬇️☀️: ️" + str(datetime.fromtimestamp(feed["daily"]["data"][0]["sunsetTime"]).strftime("%H:%M:%S"))
+    sää += "\n\n22-hour forecast:\n\n"
+    sää += hourly(0, 11, feed["hourly"]["data"], moonp)
+    sää += "\n"
+    sää += hourly(11, 22, feed["hourly"]["data"], moonp)
 
     return sää + "\n\n"
 
 
-def loadspams(job_queue, chat_data, filename):
-    with open(filename, 'r') as fie:
+def test(bot, update):
+    account = {"coords": "61.452,23.86474"}
+    update.message.reply_text(säätiedot(account))
+
+
+def loadspams(job_queue, chat_data):
+    with open(spamfile, 'r') as fie:
         accounts = json.load(fie)
 
     for i in range(len(accounts)):
@@ -170,7 +200,7 @@ def spam(bot, update, job_queue, chat_data):
         job.schedule_removal()
         del chat_data["dailyspam"]
 
-    with open('logosspams.json', 'r') as fie:
+    with open(spamfile, 'r') as fie:
         accounts = json.load(fie)
 
     chat_id = str(update.message.chat_id)
@@ -184,7 +214,7 @@ def spam(bot, update, job_queue, chat_data):
             chat_data["dailyspam"] = job
 
             thisuser["enabled"] = "true"
-            with open('logosspams.json', 'w') as file:
+            with open(spamfile, 'w') as file:
                 json.dump(accounts, file, sort_keys=True, indent=4, separators=(',', ': '))
             update.message.reply_text('Spam successfully loaded!')
             return
@@ -204,14 +234,14 @@ def unspam(bot, update, chat_data):
 
         chat_id = str(update.message.chat_id)
 
-        with open('logosspams.json', 'r') as fie:
+        with open(spamfile, 'r') as fie:
             accounts = json.load(fie)
 
         for i in range(len(accounts)):
             thisuser = accounts[i]
             if thisuser["chat_id"] == chat_id:
                 thisuser["enabled"] = "false"
-                with open('logosspams.json', 'w') as file:
+                with open(spamfile, 'w') as file:
                     json.dump(accounts, file, sort_keys=True, indent=4, separators=(',', ': '))
                 return
 
@@ -221,7 +251,7 @@ def unspam(bot, update, chat_data):
 def updateinformation(update, parameter, value):
     chat_id = str(update.message.chat_id)
 
-    with open('logosspams.json', 'r') as flie:
+    with open(spamfile, 'r') as flie:
         accounts = json.load(flie)
 
     for i in range(len(accounts)):
@@ -229,7 +259,7 @@ def updateinformation(update, parameter, value):
         if thisuser["chat_id"] == chat_id:
             thisuser[parameter] = value
 
-    with open('logosspams.json', 'w') as file:
+    with open(spamfile, 'w') as file:
         json.dump(accounts, file, sort_keys=True, indent=4, separators=(',', ': '))
 
 
@@ -238,7 +268,7 @@ def spamsettings(bot, update):
     chat_id = str(update.message.chat_id)
     check = False
 
-    with open('logosspams.json', 'r') as flie:
+    with open(spamfile, 'r') as flie:
         accounts = json.load(flie)
 
         for i in range(len(accounts)):
@@ -251,7 +281,7 @@ def spamsettings(bot, update):
                 {"chat_id": chat_id, "coords": "61.4481,23.8521", "enabled": "false", "namedays": "false",
                  "restaurant": "none", "time": "00:00:00", "weather": "false"})
 
-    with open('logosspams.json', 'w') as file:
+    with open(spamfile, 'w') as file:
         json.dump(accounts, file, sort_keys=True, indent=4, separators=(',', ': '))
 
     update.message.reply_text(
