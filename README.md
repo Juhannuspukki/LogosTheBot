@@ -1,7 +1,7 @@
 # LogosTheBot
 LogosTheBot for Telegram.
 
-Current commands:
+Supported commands:
 
 /liiga - Shows the leaders of the SM-league
 
